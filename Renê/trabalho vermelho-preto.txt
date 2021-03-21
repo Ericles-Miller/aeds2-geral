@@ -1,0 +1,398 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef enum{VERMELHO,PRETO} Cor;
+
+typedef struct no{
+    int dado;
+    struct no *pai,*esq,*dir;
+    Cor cor;
+}No;
+
+typedef struct arv{
+    No *raiz;
+}ARV;
+
+void rotacionaESQ(No **raiz, No *n)
+{
+    No *aux;
+    aux=n->dir;
+    aux->pai=n->pai;
+    n->dir=aux->esq;
+
+    if(aux->esq!=NULL)
+        aux->esq->pai=n;
+
+    aux->esq=n;
+
+    if(n->pai!=NULL){
+        if(n->pai->dir==n)
+            n->pai->dir=aux;
+        else n->pai->esq=aux;
+    }
+    else *raiz=aux;
+
+    n->pai=aux;
+}
+
+void rotacionaDIR(No **raiz, No *n)
+{
+    No *aux;
+    aux=n->esq;
+    aux->pai=n->pai;
+    n->esq=aux->dir;
+
+    if(aux->dir!=NULL)
+        aux->dir->pai=n;
+
+    aux->dir=n;
+
+    if(n->pai!=NULL){
+        if(n->pai->esq==n)
+            n->pai->esq=aux;
+        else n->pai->dir=aux;
+    }
+    else *raiz=aux;
+
+    n->pai=aux;
+}
+
+void VPcorrige(No**raiz, No*n)
+{
+    while(n->pai!=NULL && n->pai->cor==VERMELHO){
+        if(n->pai->pai->esq==n->pai){
+            if(n->pai->pai->dir!=NULL && n->pai->pai->dir->cor==VERMELHO){
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                n->pai->pai->dir->cor=PRETO;
+                n=n->pai->pai;
+            }
+            else{
+                if(n==n->pai->dir){
+                    n=n->pai;
+                    rotacionaESQ(raiz,n);
+                }
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                rotacionaDIR(raiz,n->pai->pai);
+            }
+        }
+        else{
+            if(n->pai->pai->esq!=NULL && n->pai->pai->esq->cor==VERMELHO){
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                n->pai->pai->esq->cor=PRETO;
+                n=n->pai->pai;
+            }
+            else{
+                if(n==n->pai->esq){
+                    n=n->pai;
+                    rotacionaDIR(raiz,n);
+                }
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                rotacionaESQ(raiz,n->pai->pai);
+            }
+        }
+    }
+
+    (*raiz)->cor=PRETO;
+}
+
+void insereVP(No **raiz, int dado)
+{
+    No *aux,*perc,*pai=NULL;
+
+    aux=(No*)malloc(sizeof(No));
+    if(!aux) return ;
+    aux->dado=dado;
+    aux->cor=VERMELHO;
+    aux->pai=aux->esq=aux->dir=NULL;
+
+    perc=*raiz;
+
+    while(perc!=NULL){
+        pai=perc;
+        if(dado<perc->dado) perc=perc->esq;
+        else perc=perc->dir;
+    }
+
+    aux->pai=pai;
+    if(*raiz==NULL) *raiz=aux;
+    else if(pai->dado>dado) pai->esq=aux;
+    else pai->dir=aux;
+
+    VPcorrige(raiz,aux);
+}
+
+void printarVP(No *b){
+    if(b!=NULL){
+        printarVP(b->esq);
+        printf("[%d,%d,%s]\n", b->dado, (b->pai!=NULL)?b->pai->dado:-1,(b->cor==PRETO)?"preto":"vermelho");
+        printarVP(b->dir);
+    }
+}
+
+void removerVP(No **r, int dado)
+{
+    No *aux,*antecessor,*pai_aux,*irmao_aux,*sobrinho_esq_aux,*sobrinho_dir_aux;
+    int variavel;
+
+    antecessor=pai_aux=irmao_aux=sobrinho_esq_aux=sobrinho_dir_aux=NULL;
+
+    aux=*r;
+
+    while(aux!=NULL && dado!=aux->dado){
+        if(aux->dado<dado)aux=aux->dir;
+        else aux=aux->esq;
+    }
+    if(aux==NULL) return;
+
+    //Determinamos o pai do aux
+    pai_aux=aux->pai;
+
+    //Quando o termo eh vermelho e não possui filhos
+    if(aux->cor==VERMELHO && aux->dir==NULL && aux->esq==NULL){
+        if(pai_aux->dir==aux)pai_aux->dir=NULL;
+        if(pai_aux->esq==aux)pai_aux->esq=NULL;
+        aux->pai=NULL;
+        free(aux);
+        return;
+    }
+
+    //Determinamos o antecessor
+    if(aux->esq!=NULL)antecessor=aux->esq;
+    while(antecessor!=NULL && antecessor->dir!=NULL)antecessor=antecessor->dir;
+
+    //Determinamos o irmao do aux
+    if(pai_aux!=NULL && pai_aux->esq==aux)irmao_aux=pai_aux->dir;
+    if(pai_aux!=NULL && pai_aux->dir==aux)irmao_aux=pai_aux->esq;
+
+    //Determinamos os sobrinhos do aux
+    if(irmao_aux!=NULL && irmao_aux->esq!=NULL)sobrinho_esq_aux=irmao_aux->esq;
+    if(irmao_aux!=NULL && irmao_aux->dir!=NULL)sobrinho_dir_aux=irmao_aux->dir;
+
+    /*Quando o termo antecessor eh diferente de NULL apenas trocamos e
+    chamamos novamente a função removerVP passando o dado do antecessor*/
+    if(antecessor!=NULL){
+        variavel=antecessor->dado;
+        removerVP(r,variavel);
+        aux->dado=variavel;
+        return;
+    }
+
+    //Quando o termo retirado eh preto e possui apenas um filho vermelho a direita
+    if(aux->cor==PRETO && aux->esq==NULL && aux->dir!=NULL){
+        variavel=aux->dir->dado;
+        removerVP(r,variavel);
+        aux->dado=variavel;
+        return;
+    }
+
+    //Quando o termo eh preto e não possui filhos
+    if(aux->cor==PRETO && aux->dir==NULL && aux->esq==NULL){
+
+        //Quando o termo eh a raiz
+        if(pai_aux==NULL){
+            aux=NULL;
+            return;
+        }
+
+        //Quando o termo retirado esta a esquerda do seu pai e seu pai eh vermelho
+        if(pai_aux->esq==aux && pai_aux->cor==VERMELHO){
+
+            //Quando possui sobrinho a direita
+            if(sobrinho_dir_aux!=NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                irmao_aux->cor=VERMELHO;
+                sobrinho_dir_aux->cor=PRETO;
+                rotacionaESQ(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando possui sobrinho a esquerda e sem sobrinho a direita
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux!=NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                rotacionaDIR(r,irmao_aux);
+                rotacionaESQ(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando não possui sobrinho
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux==NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                irmao_aux->cor=VERMELHO;
+                free(aux);
+                return;
+            }
+        }
+
+        //Quando o termo retirado esta a direita do seu pai e seu pai eh vermelho
+        if(pai_aux->dir==aux && pai_aux->cor==VERMELHO){
+
+            //Quando possui sobrinho a esquuerda
+            if(sobrinho_esq_aux!=NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                irmao_aux->cor=VERMELHO;
+                sobrinho_esq_aux->cor=PRETO;
+                rotacionaDIR(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando possui sobrinho a direita e sem sobrinho a esquerda
+            if(sobrinho_dir_aux!=NULL && sobrinho_esq_aux==NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                rotacionaESQ(r,irmao_aux);
+                rotacionaDIR(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando não possui sobrinho
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux==NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                pai_aux->cor=PRETO;
+                irmao_aux->cor=VERMELHO;
+                free(aux);
+                return;
+            }
+        }
+
+        //Quando o termo retirado esta a esquerda do seu pai, seu pai eh preto e seu irmao eh preto
+        if(pai_aux->esq==aux && pai_aux->cor==PRETO && irmao_aux->cor==PRETO){
+
+            //Quando possui sobrinho a direita
+            if(sobrinho_dir_aux!=NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                sobrinho_dir_aux->cor=PRETO;
+                rotacionaESQ(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando possui sobrinho a esquerda e sem sobrinho a direita
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux!=NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                sobrinho_esq_aux->cor=PRETO;
+                rotacionaDIR(r,irmao_aux);
+                rotacionaESQ(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando não possui sobrinho
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux==NULL){
+                pai_aux->esq=NULL;
+                aux->pai=NULL;
+                irmao_aux->cor=VERMELHO;
+                free(aux);
+                return;
+            }
+        }
+
+        //Quando o termo retirado esta a direita do seu pai, seu pai eh preto e seu irmao eh preto
+        if(pai_aux->dir==aux && pai_aux->cor==PRETO && irmao_aux->cor==PRETO){
+
+            //Quando possui sobrinho a esquuerda
+            if(sobrinho_esq_aux!=NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                sobrinho_esq_aux->cor=PRETO;
+                rotacionaDIR(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando possui sobrinho a direita e sem sobrinho a esquerda
+            if(sobrinho_dir_aux!=NULL && sobrinho_esq_aux==NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                sobrinho_dir_aux->cor=PRETO;
+                rotacionaESQ(r,irmao_aux);
+                rotacionaDIR(r,pai_aux);
+                free(aux);
+                return;
+            }
+
+            //Quando não possui sobrinho
+            if(sobrinho_dir_aux==NULL && sobrinho_esq_aux==NULL){
+                pai_aux->dir=NULL;
+                aux->pai=NULL;
+                irmao_aux->cor=VERMELHO;
+                free(aux);
+                return;
+            }
+        }
+
+        //Quando o termo retirado esta a esquerda do seu pai, seu pai eh preto e seu irmao eh vermelho
+        if(pai_aux->esq==aux && pai_aux->cor==PRETO && irmao_aux->cor==VERMELHO){
+            pai_aux->cor=VERMELHO;
+            irmao_aux->cor=PRETO;
+            rotacionaESQ(r,pai_aux);
+            removerVP(r,aux->dado);
+            return;
+        }
+
+        //Quando o termo retirado esta a direita do seu pai, seu pai eh preto e seu irmao eh vermelho
+        if(pai_aux->dir==aux && pai_aux->cor==PRETO && irmao_aux->cor==VERMELHO){
+            pai_aux->cor=VERMELHO;
+            irmao_aux->cor=PRETO;
+            rotacionaDIR(r,pai_aux);
+            removerVP(r,aux->dado);
+            return;
+        }
+
+    }
+
+    return;
+}
+
+int main()
+{
+    No *raiz=NULL;
+
+    insereVP(&raiz,20);
+    insereVP(&raiz,10);
+    insereVP(&raiz,30);
+    insereVP(&raiz,5);
+    insereVP(&raiz,15);
+    insereVP(&raiz,25);
+    insereVP(&raiz,35);
+    insereVP(&raiz,2);
+    insereVP(&raiz,7);
+    insereVP(&raiz,12);
+    insereVP(&raiz,18);
+    insereVP(&raiz,23);
+    insereVP(&raiz,27);
+    insereVP(&raiz,33);
+    insereVP(&raiz,38);
+
+    removerVP(&raiz,20);
+    removerVP(&raiz,18);
+    removerVP(&raiz,15);
+    //removerVP(&raiz,9);
+    //removerVP(&raiz,1);
+    //removerVP(&raiz,3);
+
+    //insereVP(&raiz,8);
+
+    printarVP(raiz);
+
+    return 0;
+}

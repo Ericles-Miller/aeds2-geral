@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <locale.h>
+
+typedef struct bloco{
+    struct bloco *prox,*ant;
+    int dado;
+    char palavra[50];
+    int quantidade;
+}Bloco;
+
+typedef struct{
+    Bloco *inicio,*fim;
+    int tamanho;
+    int quant_palavras;
+}Bucket;
+
+void inicializarBucket(Bucket *l){
+    l->inicio=l->fim=NULL;
+    l->tamanho=0;
+    l->quant_palavras=0;
+}
+
+int isEmpty(Bucket l){
+    if(l.tamanho==0) return 1;
+    return 0;
+}
+
+void inserirBucket(Bucket *l, int dado,char *s){
+    Bloco *aux,*perc;
+    //Verificando se o Bloco já existe e se existir apenas incrementar uma unidade na quantidade
+    perc=l->inicio;
+    while(perc!=NULL && perc->dado!=dado) perc=perc->prox;
+
+    if(perc!=NULL){
+        if(strcmpi(perc->palavra,s)==0){
+            perc->quantidade++;
+            l->quant_palavras++;
+        }
+        else inserirBucket(l,dado+1,s);
+        return;
+    }
+    //Alocando um novo Bloco pois o mesmo ainda não existe;
+    aux=(Bloco *)malloc(sizeof(Bloco));
+    if(aux==NULL) return;
+
+    aux->ant=aux->prox=NULL;
+    aux->dado=dado;
+    aux->quantidade=1;
+    strcpy(aux->palavra,s);
+
+    if(isEmpty(*l)){
+        l->inicio=l->fim=aux;
+        l->tamanho++;
+        l->quant_palavras++;
+    }
+
+    else{
+        l->fim->prox=aux;
+        aux->ant=l->fim;
+        l->fim=aux;
+        l->tamanho++;
+        l->quant_palavras++;
+    }
+
+    return;
+}
+
+int ComprenssaoMAD(int hash){
+    return ((31*hash + 1)%1001)%1003;
+}
+
+void HashCode(Bucket *l, char *s){
+    int r=0, i, valor;
+
+    for(i=0; s[i]!='\0'; i++){
+        if(s[i]>=65 && s[i]<=90)s[i]+=32;
+        r= ((r<<5) | (r>>27));
+        r= (int)s[i]^r;
+    }
+    valor = ComprenssaoMAD(r);
+    inserirBucket(l,valor,s);
+}
+
+void PrintarBuckets(Bucket *l, FILE *saida){
+    Bloco *perc;
+
+    perc=l->inicio;
+
+    for(;perc!=NULL;perc=perc->prox){
+        printf("\n\nDado:%d", perc->dado);
+        fprintf(saida,"\n\nDado:%d", perc->dado);
+        printf("\nQuantidade:%d", perc->quantidade);
+        fprintf(saida,"\nQuantidade:%d", perc->quantidade);
+        printf("\nPalavra:%s\n", perc->palavra);
+        fprintf(saida,"\nPalavra:%s\n", perc->palavra);
+    }
+}
+
+int main()
+{
+    Bucket l;
+    char letra,palavra[50];
+    clock_t timeexecution=clock();
+    FILE *arquivo,*saida;
+    int i=0;
+
+    inicializarBucket(&l);
+
+    printf("\nTexto Mapeado\n");
+
+    arquivo=fopen("teste.txt","r");
+    saida=fopen("saida.txt","w");
+
+    printf("\nGerando Relatorio...");
+    fprintf(saida,"\nGerando Relatorio...");
+
+    while(!feof(arquivo)){
+        fscanf(arquivo,"%c",&letra);
+
+        if((letra>=0 && letra<=47)||(letra>=58 && letra<=64)||(letra>=91 && letra<=96)||(letra>=123 && letra<=126)){
+            palavra[i]='\0';
+            if(palavra[0]!='\0')HashCode(&l,palavra);
+            i=0;
+        }
+        else{
+            palavra[i]=letra;
+            i++;
+        }
+    }
+
+    setlocale(LC_ALL, "Portuguese");
+
+    PrintarBuckets(&l,saida);
+
+    timeexecution=clock()-timeexecution;
+
+    printf("\nTempo de Execucao = %.3f segundos\n",(float)timeexecution/CLOCKS_PER_SEC);
+    fprintf(saida,"\nTempo de Execucao = %.3f segundos\n",(float)timeexecution/CLOCKS_PER_SEC);
+
+    printf("\nTamanho do Bucket = %d\n",l.tamanho);
+    fprintf(saida,"\nTamanho do Bucket = %d\n",l.tamanho);
+
+    printf("\nQuantidade de palavras = %d\n",l.quant_palavras);
+    fprintf(saida,"\nQuantidade de palavras = %d\n",l.quant_palavras);
+
+    fclose(arquivo);
+
+    return 0;
+}

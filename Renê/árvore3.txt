@@ -1,0 +1,531 @@
+Estrutura de dados avanada 
+
+	ÁRVORE 
+
+	TAD onde o conjunto de dados está organizado de forma mais complexa, diferente das listas encadeadas.
+
+	Organização de forma hierárquica. 
+	Existem várias formas de representar árvores, as mais comuns são:
+		- ParÇenteses aninhados (A(B)(C(D(G)(H)(E)(F(I))))
+		- Diagrama de inclusão (conjuntos matemárica)
+		- Alinhamento de nós 
+					A
+					 B
+					 C
+	Definiões: 
+		- Uma árvore é composta por nós 
+		- Sempre existe um nó R, denominado raiz, que contém zero ou mais subárvores, cujas raizes são ligadas diretamente a R;
+		- Os nós raizes da dsubárbores são ditos filhos do nó pai, 
+		- Os nós sem filhos são chamados de folhas 
+		- Existe um único caminho para a raiz 
+		- Altura da árbore: é o comprimento do caminho mais longo até uma das folhas
+		- Nível de um nó: comprimento do caminho da raiz até o nó 
+		- Grau de um nó: número de filhos do nós
+		- Grau da árvore: o número maiximo de golhos de um nó
+
+	-> ÁRVORE BINÁRIA 
+		
+		cada nó tem zero um ou dois filhos, de maneira recursiva podemos definir uma árvore binária como sendo:
+		- uma árvore vazia;
+		- um nó raiz tendo uas subárbores identificiadas como subárvore da direita (sad) e  a subárvore da esquerda (sae).
+
+		Pela definição, uma subárvore de uma árvore binária é sempre especificada como sendo a sae ou a sad de uma árvore maior, e qualquer das duas subárvores pode ser vazia 
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+struct arv{
+	char dado;
+	struct arv* esq;
+	struct arv* dir;
+};
+
+typedef struct arv Arv;
+
+Arv* inicializa (void){
+	return NULL;
+}
+
+Arv* criaNo(char dado, Arv *sae, Arv *sad){
+	Arv *temp = (Arv*)malloc(sizeof(Arv));
+	temp->dado=dado;
+	temp->esq=sae;
+	temp->dir=sad;
+	return temp;
+}
+
+void imprime(Arv *a){
+    if(a!=NULL){
+        printf("%c",a->dado);
+        imprime(a->esq);
+        imprime(a->dir);
+    }
+}
+
+/*Arv* libera(Arv* a){
+    if(a!=NULL){
+            a->esq=libera(a->esq);
+            a->dir=libera(a->dir);
+            free(a)
+    }
+    return NULL;
+}*/
+
+int bisca (Arv* a, char c){
+    if(a==NULL)
+        return 0; //árvore vazia ou não encontrada
+    else
+        return a->dado==c||bisca(a->esq,c)||bisca(a->dir,c);
+}
+
+int altchura(Arv *a){
+    int d, e;
+    if(a!=NULL){
+        e=altchura(a->esq);
+        d=altchura(a->dir);
+        if(e==-1&&d==-1)
+                return 1;
+        if(e>d)
+            return e++;
+        return d++;
+
+    }
+    return -1;
+}
+
+
+
+
+int main(){
+    Arv *A;
+    char a='a', b='b', c='c', d='d', e='e', f='f';
+
+    A=criaNo('a',
+        criaNo('b',
+            criaNo('c',
+                criaNo('d',inicializa(),inicializa()),
+                criaNo('e',inicializa(),inicializa())
+            ),
+            criaNo('f',inicializa(),inicializa())
+        ),
+        criaNo('g',
+            criaNo('h',
+                criaNo('i',
+                    criaNo('j',inicializa(),inicializa()),
+                    inicializa()
+                ),
+                inicializa()
+            ),
+            criaNo('k',
+                criaNo('l',inicializa(),inicializa()),
+                criaNo('m',inicializa(),inicializa())
+            )
+        )
+    );
+
+
+
+    printf("%i",altchura(A));
+     return 0;
+}
+
+
+============================================================================================
+
+ABB = Árvore de Busca Binária 
+	
+	objetivo: facilitar a pesquisa por dados na memória principal
+	
+	Regra geral: as chaves dos nós SAE são sempre menores que a chave da raiz e as chaves dos nós SAD são sempre maiores que a chave da raiz.
+	para n dados, Leva ~ log(n)[2], se a árvore estiver balanceada. (dados inceridos de forma aleatória) 
+
+Inserção: 
+
+Verifica se a árvore esá vazia
+	-> se estiver vazia, cria-se um nó e insere na árvore
+	-> se não:
+		-verifica se o dado é menor que a raiz 
+			-> se for, de forma recursiva, verifica-se a SAE.
+			-> senão, de forma recursiva, verifica-se a SAD.
+
+
+typedef struct bloco{
+	int dado;
+	struct bloco *dir, *esq;
+} No;
+
+typedef struct{
+	No *raiz
+} Arvore;
+
+int insereAAB(No **r, int dado){
+ No *aux;
+
+if(*r==NULL){
+	aux=(No *)malloc(sizeof(No);
+	if(!aux) return 0;
+	aux->dado=dado;
+	aux->dir=aux->esq=NULL;
+	*r=aux;
+	return 1;
+}
+else if (dado < (*r)->dado)
+	return insereABB(&(*r)->esq, dado);
+else if (dado >(*r)->dado);
+	return insereABB(*r)->dir,dado);
+retun 0;
+}
+
+// Remoção
+
+caso1: nó sem filhos
+caso2: nó com um filho 
+caso3: nó com dois filhos 
+( Pgar o menor da SAD ou o maior da SAE 
+
+No * procura maior(No *r){
+	while(r->dir!=NULL)
+		r=r->dir;
+	return r;
+} 
+
+int removerABB(No **r, int dado){
+No *aux
+
+if(*r!=NULL){
+
+	if(dado<(*r)->dado)
+	 	return removerABB(&(*r)->esq, dado);
+	else if(dado> (*r)->dado)
+		retunrn removerABB(&(8r)->dir, dado);
+	if((*r)->esq==NULL&&(*r)->dir==NULL){
+		free(*r);
+		*r=NULL;
+		return 1;
+	}
+	
+	else if((*r)->!=NULL&&(*r)->==NULL){
+		aux=*r;
+		*r=aux->esq;
+		aux->esq=NULL;
+		free(aux); 
+		return 1;
+	}
+	else if((*r)->!=NULL&&(*r)->==NULL){
+		aux=*r;
+		*r=aux->dir;
+		aux->dir=NULL; 
+		free(aux);
+		return 1; 
+	} 
+
+	else {
+	
+	aux=procuraMaior((*r)->esq);
+	//copiar dados de aux para *r
+	(*r)->dado=aux->dado;
+	return removerABB(&(*r)->esq, aux->dado);
+	}
+}
+return 0;
+}
+	
+//=====================================
+
+	Percurso (caminhamento) em árvores binárias 
+	
+-em ordem SAE-R-SAD
+-pós ordem SAE-SAD-R
+-pré ordem R-SAE-SAD
+	
+in-fixa: a b c d e f g
+pré-fixa:a c b e g f d 
+pós-fixa:d b a c f e g 
+
+in-fixa
+
+void printEmOrdem(No *r){
+if(r!=NULL){
+	printEmOrdem(r->esq);
+	printf("%d", r->dado);
+	printEmOrdem(r->dir);
+}
+}
+
+void printPreOrdem(No *r){
+if(...)
+	preordem(esq)
+	preordem(dir)
+	print
+}
+}
+
+void printPosOrdem(No *r){
+if(...)
+	pprint
+//=========================================
+
+1)em largura: percorer pelos niveis FILA para controlar a visitação dos nós 
+
+fila fifo
+
+//necessário alterar a fila para que ela aciete o tipo No * e a função enfieliera para que ela aciete não somete o tipo No * mas também que ela verifique se o dado é nulo ou não, caos NULL return 0
+
+
+
+
+1- coloco a raiz na fila 
+2- enquanto a fila não está vazia 
+	-retiro um nó 
+	-coloco seus filhos na fila 
+{
+
+void printEmLargura(No *r){
+Fila f;
+int dado;
+No *auxE;
+
+inicializaFila(&f);
+if(r!=NULL){
+	enfileira(&f, r);
+	while(!isEmpty(f)){
+		printf("%d",f.iniciio->dado->dado);
+		aux=f.inicio->dado;
+		desenfileira(*f);
+		enfileira(&f, aux->esq);
+		enfileira(&f, aux->dir);
+	}
+ }
+}
+
+fica como exercício implementar a busca em profundidade
+
+		
+
+
+2)em profundiade: de folha em folha PILHA 
+
+
+
+===========================================================================
+
+Árvore AVL	árvore binparia de busca balanceada 
+
+Rregra de Balanceamento: a diferença de altura entre a SAE e a SAD é de no máximo 1.
+
+Padrões de Rotações: 
+
+rotação simples à dir ou à esq (pegar no photos e anexar) -> inserido à esquerda da minha esquerda ou direita da minha direita. 
+
+rotação dupla esquerda direita ou direita esquerda (pegar no photos e anexar) -> inserido à esquerda da minha direita, ou à direita da minha esquerda. 
+
+ALGORITMO
+
+int Altura(No *r){
+if(r==NULL)
+	return -1;
+return r->altura;
+}
+
+int Maior(int a, int b){
+if (a>b)
+	return a;
+else return b;
+}
+
+typedef struct _No{
+	int dado, altura;
+	struct no *esq, *dir;
+}
+
+void rotacaoDir(No **r){
+ No *aux;
+ aux=(*r)->esq;
+ (*r)->esq=aux->dir;
+ aux->dir=*r;
+ (*r)->altura=Maior(Altura((*r)->esq),Altura((*r)->dir)))+1;
+ aux->altura=Maior(altura(aux->esq),(*r)->altura)+1;
+ *r=aux;
+}
+
+int insereAVL(No **r, int dado){
+No *aux;
+ if(*r==NULL){
+	aux=(No *)malloc(sizeof(No));
+	if(aux==NULL) return 0;
+	aux->dado=dado
+	aux->altura=0;
+	aux-esq=aux->dir=NULL;
+	*r=aux;
+	return 1;
+ }
+ 
+ else if(dado<(*r)->dado){
+ 	if (insereAVL(&(*r)->esq, dado))//balanceia 
+		if(Altura((*r)->esq)-Altura((*r)->dir)==2){
+			if(dado<(*r)->esq->dado)
+				rotacaoDir(r);
+			else rotacaoEsqDir(r);
+			}
+		}
+	}
+	else if (insereAVL(&(*r)->dir, dado))//balanceia 
+		if(Altura((*r)->dir)-Altura((*r)->esq)==2){
+			if(dado<(*r)->dir->dado)
+				rotacaoEsq(r);
+			else rotacaoDirEsq(r);
+			}
+		}
+	}
+ (*r)->altura=Maior(Altura((*r)->esq),Altura((*r)->dir)+1));
+ return 1;
+}
+
+
+//REMOÇÃO 
+
+int removeAVL(No **r, int dado){
+
+if(*r==NULL) return 0;
+else if((*r)->dado>dao){
+	if(removeAVL(&(*r)->esq, dado))
+		if(Altura((*r)->dir)-Altura((*r)->esq)==2){
+			if(Altura(*r)->dir->dir)>Altura(*r)->dir->esq))
+				rotaçãoEsquerda(r);
+			else
+				rotaçãoDireitaEsquerda(r);
+		}
+	}
+else if((*r)->dado<dado){
+	if(removeAVL(&(*r)->dir, dado))
+		if(Altura((*r)->esq)-Altura((*r)->dir)==2){
+			if(Altura(*r)->esq->esq)>Altura(*r)->esq->dir))
+				rotaçãoDireita(r);
+			else
+				rotaçãoEsqurdaDireita(r);
+		}
+	}
+else{
+//removeABB
+//return 1;
+}
+(*r)->altura=Maior((*r)->dir->altura, (*r)->esq->tamanho)+1;
+return 1;
+}
+
+
+===========================================================================
+
+Heap
+
+heap de máximo: toda raiz é maior que seus filhos 
+heap de minimo: toda raiz é menor que seus filhos
+
+array: [10][5][3][1][4][2][0]
+
+pai: |_(i-1)/2_|
+esq: 2i+1
+dir: 2i+2
+heapfica(A,p){
+esq=2*p+1;
+dir=2*p+2;
+if(esq<tam(A)&&
+ConstroiHeap(A){
+meio=round((i+f)/2)
+for (p=meio; i>meio; p--){
+	hipifica(A,p)
+
+
+IMPLEMENTEAR O HEAP COM ÁRVORE BALANCEADA
+
+
+===========================================================================
+
+HEAP BINÁRIO  
+
+
+sendo h a sua altra, um heap binpario é sempre completo no nível h ou h-1. Se for completo no nível h-1, os nós no nível h são agrupados mais à esquerda.  
+
+
+typedef struct{
+	int *v;
+	int fim;
+	int tam;
+}heapbin;
+
+int InicializaHeap( heapbin *hb, int tam) {
+hb->v=(int *)malloc(siezeof(int)*tam);
+hb->fim=tam-1;
+hb->tam=tam;
+if(!hb->v) return 0;
+return 1;
+}
+int ConstroiMaxHeap(heapbin *hb){
+int meio=(hb->fim+1)/2
+for(; meio>=0;meio--){
+	maxheapifica(hb,meio);
+
+
+void MaxHeapFica( heapbin *hb, int meio){ 
+int maior, esq, dir;
+maior=meio;
+esq=2*meio+1;
+dir=2*meio+2;
+	if(esq<hb->bin && hv->v[esq]>hb->v[meio])
+		maior=esq;
+	if(dir<hb->fim && hb->v[dir]>hb->v[maior])
+		maior=dir;
+	if(maior!=meio){
+		troca(hb->v, maior);
+		maxheapfica(hb, maior);
+	}
+}
+
+int RemoveRaizHeap(heapbin *hb){
+int aux=hb->v[0];
+hb->v[0]=hb->v[hb->fim];
+hb->fim--;
+MaxHeapFica(hb, 0);
+return aux;
+}
+
+void InsereMaxHeap(heapbin *hb, int novo){
+int *aux;
+
+if(hb->fim<hb->tam-1){
+	hb->v[hb->fim+1]=novo;
+	hb->fim++;
+	}
+HeapficaSubindo(heapbin *hb, int pos){
+int pai=(pai-1)/2;
+	if(hb->v[pos]>hb->v[pai])
+		troca(hb->v, pos, pai);
+HeapficaSubindo(hb, pai);
+}
+
+else {
+	aux=(int *)malloc(sizeof(int)*hb->tam+1);
+	copia(hb->v, aux);
+	hb->tam++;
+	hb->fim++;
+	free(hb->v);
+	hb->v=aux;
+	}
+HeapficaSubindo(hb->v, hb->fim);
+}
+===========================================================================
+Heap Binário (dinamico)
+
+
+
+typedef struct bloco[
+	int dado; 
+	struct bloco *pai, *esq, *dir;
+}No;
+
+void ControiMaxHeapDinamic( No **raiz){
+
+
+
+

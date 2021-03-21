@@ -1,0 +1,115 @@
+TABELAS HASH 
+
+TAD em fora de dicionários (extremamente focada em dicionários)
+
+a ideia de tabel vem dos arrays pois o endereçamento é direto (os índices são endereços)
+
+Tempo constante == um passo 
+
+Busca_enderço_direto(T,k)
+return T[k]
+
+Inserção_end_direto(T,x)
+ T[chave[x]]
+
+Remoção_end_direto
+
+Porblema do endereçamento direto, para gandres universos o necessita de um sequencial grande de memória limpo 
+Além disso, o conjunto K de chaves (realmente utilizadas) pode ser tão pequeno que pode haver o desperdício de memória 
+
+Arranjo de buckets 
+	"Baldes" acossidados a posições aos "nomes" das chaves, aonde nomes repetidos caem no mesmo balde (problema de colisão) 
+
+	Quando o conjunto de chaves armazenadas em um dicionário uma tabela hash é muito mais útil do que o universo U pois a tabela hash utiliza muito menos memória. O tempo de procura dentro da tabela hash é relativamente pequeno quase constante.
+	A função hash h é utilizada para calcular uma posição a partir de uma chavve k
+		h mapeia o Universo U de chaves nas posiç~eos de uma tabela de tamanho n 
+
+HASH Table (array associativo) 
+	estrutura composta por pares (chave, valor)
+A chave k é mapeara par a posilão h(k) 
+h(k) é o valor hash da tabela 
+
+Duas partes
+	código hahs: mapeia uma chave em um número interio qualqauer 
+	função de comprewssão: mapeia um intenrio em um interiro no intervalode de [0,n-1]
+
+->interiors longos para interios 
+
+int hashcode(long x){
+ int p1, p2;
+p1=(int)x;
+p2=(int)(x>>32);
+return(p1+p2);
+}
+
+->strings para interiros: 	somar o ASCII
+
+int hashcode(char *s){
+ int p=0, i;
+for(i=0; s[i]!='\0'; i++)
+	p=p+s[i];
+return p;
+}
+//gera colisões  em hash pois a "abc"=="bca"=="cab"...
+
+				código polinomial 
+//regra de horner 
+int hashcode(char*s){
+int r=0, i;
+for(i=0; s[i]!='\0'; i++)
+	r=(int) s[i]+a*r
+return r;
+}
+//utilizando shifts
+int hashcode(char*s){
+int r=0, i;
+for(i=0; s[i]!='\0'; i++)
+	r=(int) s[i]+(r<<1);
+return r;
+}
+//shifts defintivos 
+int hashcode(char *s){
+ int r=0, i;
+for(i=0; s[i]!='\0'/ i++){
+	r= (r<<5) | (r>>27);
+	r=(int) s[i]+r;
+}
+return r;
+}
+
+
+//hash rotatório DEFINTIVIO
+int hashcode(char *s){
+ int r=0, i;
+for(i=0; s[i]!='\0'/ i++){
+	r= (r<<5) | (r>>27);
+	r=(int) s[i]^r;
+}
+return r;
+}
+
+Cmpressão 
+
+Método da divisão 
+	hashcod % N
+		n==tamanho da tabela (se N for primo diminiui o tamanho das colisões)
+		não deve ser uma potência de 2 pois trabalha com o grupo de P bits (n^P)
+		para escolher um número primo mais próximo da razão entre a quantidade de colisões e o tamanho da tabela 
+
+
+Método MAD(multiplicação, adição e divisão)
+
+((a*hashcode+b)%p)%n)
+
+	a e b<p
+
+Método da dobra e da multiplicação 
+
+Tratamento de Colisões 
+
+Fator de carga: que pe a razão de quantidade de chaves/ n posições. Tabelas abaixo de 0.7 é o ideal 
+
+Por encadeamento 
+	 a partir de casa colisão você cria uma lista encadeada 
+	tempo de inserção constante e de pesquisa e remoção proporcional aq uantidade de elementos da lista 
+	se a lista for uma a AVL o tempo de pesquisa vai ser próximo de constante 

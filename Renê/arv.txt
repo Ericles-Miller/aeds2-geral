@@ -1,0 +1,111 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+typedef struct arv
+{
+    char dado;
+    struct arv *esq;
+    struct arv *dir;
+} Arv;
+
+Arv* inicializa()
+{
+    return NULL;
+}
+
+Arv* criaNo(char dado,Arv *sae,Arv *sad)
+{
+    Arv* temp=(Arv*)malloc(sizeof(Arv));
+    temp->dado=dado;
+    temp->esq=sae;
+    temp->dir=sad;
+    return temp;
+}
+
+void imprime(Arv *a)
+{
+    if(a!=NULL)
+    {
+        printf("%c",a->dado);
+        imprime(a->esq);
+        imprime(a->dir);
+    }
+}
+
+Arv* libera(Arv* a)
+{
+    if(a!=NULL)
+    {
+        a->esq=libera(a->esq);
+        a->dir=libera(a->dir);
+        free(a);
+    }
+    return NULL;
+}
+
+int altura(Arv *a)
+{
+    int E,D;
+
+    if(a!=NULL)
+    {
+        E=altura(a->esq);
+        D=altura(a->dir);
+
+        if(E==-1 && D==-1) return 0;
+
+        if(E>D) return ++E;
+
+        return ++D;
+    }
+
+    return -1;
+}
+
+int altura2(Arv *a){
+    if(a==NULL) return -1;
+    int n=0,d,b;
+    if(a->esq==NULL&&a->dir==NULL) return 0;
+    d=altura2(a->esq);
+    b=altura2(a->dir);
+    n+=d>=b?d:b;
+    n++;
+    return n;
+}
+
+int main()
+{
+    Arv *a;
+    int b;
+
+    a=criaNo('a',
+        criaNo('b',
+            criaNo('c',
+                criaNo('d',inicializa(),inicializa()),
+                criaNo('e',inicializa(),inicializa())
+            ),
+            criaNo('f',inicializa(),inicializa())
+        ),
+        criaNo('g',
+            criaNo('h',
+                criaNo('i',
+                    criaNo('j',inicializa(),inicializa()),
+                    inicializa()
+                ),
+                inicializa()
+            ),
+            criaNo('k',
+                criaNo('l',inicializa(),inicializa()),
+                criaNo('m',inicializa(),inicializa())
+            )
+        )
+    );
+
+
+    imprime(a);
+    b=altura(a);
+    printf("%d",b);
+
+    return 0;
+}
+

@@ -1,0 +1,391 @@
+Estrutura de Dados Avan�adas 
+
+Tipos abstratos de Dados:
+	-abstrai um conjunto de dados e as oera��es sobre esse conjunto 
+
+	Conjuntos din�micos:
+		- conjuntos que podem aumentar seu tamanho devido a demanda 
+			Ex.: Filas, pinhas, �rvores, dicion�rios e etc.
+		- opera��es t�picas:
+			Busca (S, k)
+			insere(S, x)
+			Remove(S, x)
+			M�nimo(S)
+			M�ximo(S)
+			Sucessor(S, x)
+			Processos(S, x)
+
+TDAs elementares: Pilhas e Filas e Listas 
+
+	-Pilha (stack): o elemento eliminado do conjunto � o mais recentae a ser inserido. Implementa a retra do �ltimo a entrar,
+	 primeiro a sairm ou LFIO( Last-in, Last-out).
+		PUSH: inserir.
+		POP: remover.
+		Somente o elemento do topo est� acess�vel. Caso n�o exista elemento no topo da pilha  dizemos qeue ela est� vazia.
+		Caso a plinha tenha um tamanho fixo, ou pr�definido:
+		Estouro negativo: removemos mais que o poss�vel.
+		Estouro positivo: incerimos mais que o poss�vel.
+{ implementa��o 
+
+#define TRUE 1 
+#define FALSE 0
+
+typedef int boleano;
+
+typedef struct bloco{
+	int dado;
+	struct bloco *prox;
+} Bloco;
+
+typedef struct pilha { // descritor
+	Bloco *topo;
+	int tamanho; 
+} Pilha
+
+void inicializarPilha ( Pilha *p ){
+	p->topo=NULL;
+	p->tamanho=0;
+}
+
+int isEmpty ( Pilha p ){
+	if ( p.tamanho==0 )
+		return TRUE;
+	return FALSE;
+}
+
+boleano push( Pilha *p, int dado ){
+	Bloco *aux;
+	aux=(Bloco *)malloc(sizeof(Bloco));
+	
+	if(!aux) return FALSE;
+
+	//preparar o bloco para ser inserido o dado
+	aux->dado=dado;
+	aux->prox=NULL;
+	// insere bloco na pilha
+	aux->prox=p->topo;
+	p->topo=aux;
+	p-> tamanho++;
+	return TRUE;
+}
+
+boleano pop( Pilha *p){
+	Bloco *aux;
+	if( isEmpty (*p))
+		return FALSE; 
+	aux= p->topo;
+	p->topo=aux->prox;
+	aux->prox=NULL;
+	free(aux);
+	p->tamanho--;
+	return TRUE;
+}
+
+Exerc�cio:
+
+1- Escreva uma fun��o para mostrar o conte�do da pilja, indicando qual elemento est� no topo e qual elemento est� na base;
+2- Escreva uma fun��o para iinverter o conte�do da pilha;
+3- Escreva uma fun��o que receba duas pilhas p1 e p2, e copie o conte�do de p1 em p2; 
+
+Resposta:
+
+1-
+void conteudo( Pilha p){
+	int toper=p.topo->dado;
+	Bloco *aux;
+printf("%d", toper);
+
+for( aux=p.topo; axu->proximo!=NULL; aux=aux->proximo){
+	printf("%d", aux->dado );
+ }
+
+2-
+
+
+
+
+=====================================================================================================================================
+ 
+	-Fila (queue): o elemento eleiminado � sempre o qu e esteve no conjunto pelo tempo mais longo. Implenmenta a regra de primeiro a entrar primeiro a sair, ou FIFO ( First-in, First-out )
+		N�o possui no��o de topo mas sim de inicio e fim.
+
+typedef struct{
+Bloco *inicio, *fim;
+int tamanho;
+} Fila;
+void inicializaFila ( Fila *f){
+===implementar===
+}
+void isEpty (Fila f){
+===implementar===
+} 
+
+booleano enfileira( Final *f, int dado ){
+Bloco *ayx;
+
+aux=(Bloc *)mallco(sizeof(bloco));
+if(!aux) return FALSE;
+	
+//Preaparar o bloco
+
+aux->dado=dado;
+aux->prox=NULL;
+
+if( isEmpty(*f) ){ //if(f=inicio==NULL)
+	f->inicio=f->fim=aux;
+	f->tamanho++;
+}
+
+else {
+f->fim->proximo=aux;
+f->fim=aux;
+f->tamanho++;
+}
+
+return TRUE;
+}
+
+booleano desenfieleira( Fila *f ){
+Bloco *aux;
+
+if ( isEmpty(*f)) return FALSE;
+
+else if ( f->inicio==f->fim){
+free(f->inicio);
+f->inicio=F->fim=NULL;
+}
+else {
+aux=f->inicio;
+f->incio=aux->proximo;
+aux->proximo=NULL;
+f->tamanho--;
+free(aux);
+}
+return TRUE;
+}
+
+
+
+
+
+
+=====================================================================================================================================
+
+
+
+	-Lista (list): � uma TAD gen�rio que n�o possui regras fixas de manipula��o. Em tese sua imple,emeta��o deve permitir novas opera��es de inser��o ou remoss�o de qualquer posi��o do comjumeto.
+		Listas encadeadas:
+			Simples a->b->c
+ 			Duplo a<->b<->c
+			Circular ->a<->b<->c<-
+
+
+
+
+		-Lista duplamente encadeada: a<->b<->c
+
+typedef struct bloco{
+	int dado;
+	struct bloco *ant, *prox;
+}Bloco;
+
+typedef struct {
+	Bloco *incio;
+	int tamanho;
+} ListaD;
+
+/* Regras 	Inscer��o: ordenada.
+		Remo��o: dado um valor a ser procurado.
+*/
+
+booleano insereOrdenado( ListaD *l, int dado ){
+Bloco *aux, *perc;
+
+aux=(Bloco *)malloc(sizeod(Bloco));
+if(!aux) return FALSE;
+
+aux-anterior=aux->prox=NULL;
+aux->dado=dado;
+
+if(isEmpty(*l)) 
+	l->inicio=aux;
+else {
+	if(dado<l->incio->dado){
+		aux->proximo=l->incio;
+		l->inicio->anterior=aux;
+		l->inicio=aux;
+	}
+	
+	else {
+		
+		//for( perc=l->inicio->prox; perc->prox!=NULL && perc->dado > dado ; perc=perc->prox)
+		while(perc->prox!=NULL && perc->prox->dado<dado)
+			perc=perc->prox;
+
+		aux->prox=perc->prox;
+		perc->prox=aux;
+		aux->ant=perc;
+		if(aux->prox!NULL)
+			aux->prox-> aux;
+	}
+}
+
+l->tamanho++;
+return TRUE;
+}
+
+Exerc�cio 
+
+1- Fazer a fun��o que remove os blocos.
+2- Fazer a fun��o para mostrar o conte�do.
+3- Fazer a fun��o para l
+
+
+Lista de ordenados impar e pares, remo��o no out
+ 
+typedef struct bloco {
+int dado;
+struct bloco *prox;
+struct bloco *ant;
+} Bloco;
+
+typedef struct{
+int tamanho;
+Bloco *inPar;
+Bloco *outPar;
+Bloco *inImpar;
+Bloco *outImpar;
+} IlistaP;
+
+boole isEmpty(IlistaP L){
+if(outImpar==NULL && inPar==NULL) return TRUE;
+else return FALSE;
+}
+
+int pnoe (IlistaP *l, int d){
+Bloco *aux, *percin, *percout;
+aux=(Bloco *)malloc(sizeof(Bloco));
+if(!aux ) return FALSE;
+
+aux->prox=NULL;
+aux->ant=NULL;
+aux->dado=d;
+//
+//
+//
+if( isEmpty)
+	if(aux->dado%2==0){
+		l->inPar=aux;
+		l->outPar=aux;
+	}
+	else {
+		l->inImpar=aux;
+		l->outImpar=aux;
+	}
+else {
+	percin=l->outImpar->proximo;
+	if(aux->dado%2==0){
+		while(percin->proximo!=NULL && percin->prox->dado<aux->dado) 	percin=percin->prox;
+		
+		if(aux->proximo!NULL)
+			aux->proximo=perc->proximo;
+		aux->ant=perc;
+		perc->prox=aux;
+
+
+		-Lista Circular ->a<->b<->c<-
+			propriedades:	o cursor pode se movimentar na lista;
+					novos elementos s�o inseridos ap�s o cursor 
+					elementos s�o movidos da posi��o que est� � frente do cursor 
+			com v�rios elementos:	c->a->b->c->a
+			com um elemento: 	a->a->a			
+
+
+			Fun��es:	avan�arCursor
+					Inserir
+					Remover 
+#define TRUE 1
+#define FALSE 0
+
+typedef int booleano;
+
+typedef struct {
+Bloco *cursor;
+int tamanho;
+}ListaCircular;
+
+void  ListaCircular(ListaCircular *l){
+...
+}
+
+booleano isEmpty(ListaCircular l){
+...
+}
+
+void AvancaCursor(lista *l){
+if(isEmpty (*l)) return;
+l->cursor=l->cursor->prox;
+}
+
+booleano InserirLC(ListaCircular *l, int dado){
+Bloco *aux;
+aux=(Bloco *)malloc(sizeof(Bloco));
+if(!aux) return FALSE; 
+
+aux->dado=dado;
+aux->prox=NULL;
+//
+if(isEmpty(*l)) {
+	l->cursor=aux;
+	aux->prox=aux;
+}
+
+else{
+aux->prox=l->cursor->prox;
+l->cursor->prox=aux; 
+}
+l->tamanho++;
+return TRUE;
+}
+
+void remove(ListaCircular *l){
+Bloco *per;
+if(isEmpty(*l)) return FALSE;
+if(l->cursor->prox=l->cursor)//l->tamanho==1 
+free(l-cursor);
+l->cursor=NULL;
+}
+else{
+per=l->cursor->prox;
+l->cursor->prox=per->prox;
+per->prox=NULL;
+free(aux);
+}
+l->tamanho--;
+returne TRUE;
+}
+						Exerc�cio
+
+1- Escreva uma fun��o que mostre o conte�do da lista circular 
+2- Escreva uma fun��o que possui 2 par�metros Salto e 
+
+void MostraConte�do(lsitaCircular l){
+Bloco *perc;
+
+for(perc=l->cursor; l->cursor!=perc; avancaCursor(ListaCircular *l)
+printf("%d", l->cursor->dado);
+}
+
+booleano SaltoImprime ( ListaCircular *l, int s, int i){
+Bloco *perc
+while(s>0){
+	avancacursor(l);
+	s--;
+}
+for (perc=l->cursor; i>0; i--){
+	printf("%d", perc->dado);
+	perc=perc->proximo; 
+}
+=====================================================================================================================================
+
+		

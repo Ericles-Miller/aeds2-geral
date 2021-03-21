@@ -1,0 +1,154 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef enum{VERMELHO,PRETO} Cor;
+
+typedef struct no{
+    int dado;
+    struct no *pai,*esq,*dir;
+    Cor cor;
+}No;
+
+typedef struct arv{
+    No *raiz;
+}ARV;
+
+void rotacionaESQ(No **raiz, No *n)
+{
+    No *aux;
+    aux=n->dir;
+    aux->pai=n->pai;
+    n->dir=aux->esq;
+
+    if(aux->esq!=NULL)
+        aux->esq->pai=n;
+
+    aux->esq=n;
+
+    if(n->pai!=NULL){
+        if(n->pai->dir==n)
+            n->pai->dir=aux;
+        else n->pai->esq=aux;
+    }
+    else *raiz=aux;
+
+    n->pai=aux;
+}
+
+void rotacionaDIR(No **raiz, No *n)
+{
+    No *aux;
+    aux=n->esq;
+    aux->pai=n->pai;
+    n->esq=aux->dir;
+
+    if(aux->dir!=NULL)
+        aux->dir->pai=n;
+
+    aux->dir=n;
+
+    if(n->pai!=NULL){
+        if(n->pai->esq==n)
+            n->pai->esq=aux;
+        else n->pai->dir=aux;
+    }
+    else *raiz=aux;
+
+    n->pai=aux;
+}
+
+void VPcorrige(No**raiz, No*n)
+{
+    while(n->pai!=NULL && n->pai->cor==VERMELHO){
+        if(n->pai->pai->esq==n->pai){
+            if(n->pai->pai->dir!=NULL && n->pai->pai->dir->cor==VERMELHO){
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                n->pai->pai->dir->cor=PRETO;
+                n=n->pai->pai;
+            }
+            else{
+                if(n==n->pai->dir){
+                    n=n->pai;
+                    rotacionaESQ(raiz,n);
+                }
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                rotacionaDIR(raiz,n->pai->pai);
+            }
+        }
+        else{
+            if(n->pai->pai->esq!=NULL && n->pai->pai->esq->cor==VERMELHO){
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                n->pai->pai->esq->cor=PRETO;
+                n=n->pai->pai;
+            }
+            else{
+                if(n==n->pai->esq){
+                    n=n->pai;
+                    rotacionaDIR(raiz,n);
+                }
+                n->pai->cor=PRETO;
+                n->pai->pai->cor=VERMELHO;
+                rotacionaESQ(raiz,n->pai->pai);
+            }
+        }
+    }
+
+    (*raiz)->cor=PRETO;
+}
+
+void insereVP(No **raiz, int dado)
+{
+    No *aux,*perc,*pai=NULL;
+
+    aux=(No*)malloc(sizeof(No));
+    if(!aux) return ;
+    aux->dado=dado;
+    aux->cor=VERMELHO;
+    aux->pai=aux->esq=aux->dir=NULL;
+
+    perc=*raiz;
+
+    while(perc!=NULL){
+        pai=perc;
+        if(dado<perc->dado) perc=perc->esq;
+        else perc=perc->dir;
+    }
+
+    aux->pai=pai;
+    if(*raiz==NULL) *raiz=aux;
+    else if(pai->dado>dado) pai->esq=aux;
+    else pai->dir=aux;
+
+    VPcorrige(raiz,aux);
+}
+
+void printarVP(No *b){
+    if(b!=NULL){
+        printarVP(b->esq);
+        printf("[%d,%d,%s]\n", b->dado, (b->pai!=NULL)?b->pai->dado:-1,(b->cor==PRETO)?"preto":"vermelho");
+        printarVP(b->dir);
+    }
+}
+
+int main()
+{
+    No *raiz=NULL;
+
+    insereVP(&raiz,6);
+    insereVP(&raiz,3);
+    insereVP(&raiz,2);
+    insereVP(&raiz,7);
+    insereVP(&raiz,8);
+    insereVP(&raiz,9);
+    insereVP(&raiz,1);
+    insereVP(&raiz,4);
+    insereVP(&raiz,0);
+    insereVP(&raiz,10);
+
+    printarVP(raiz);
+
+    return 0;
+}

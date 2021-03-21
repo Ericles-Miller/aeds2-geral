@@ -1,0 +1,96 @@
+Structs recursivas 
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct bloco{
+	int dado;
+	struct bloco *proximo;
+}bloco;
+
+int main(){
+
+bloco a,b,c;
+
+a.dado=1;
+b.dado=2;
+c.dado=3;
+a.proximo=&b;//recebe end de memoria de b
+b.proximo=&c;//recebe end de memoria de c
+printf("%d", a.proximo->proximo->dado);//end de c?
+}
+
+Dinamicamente 
+
+int main(){
+
+Bloco a;
+
+a->dado=1;
+a->proximo=(Bloco *)malloc(sizeof(Bloco));
+a->proximo->dado=2;
+a->proximo->proximo=(Bloco *)malloc(sizeof(Bloco));
+a->proximo->proximo->proximo->dado=3;
+
+printf("%d", a->proximo->proximo->dado);
+}
+
+Fun��o armazenadora 
+
+void armazena(Bloco **p; int d){
+Bloco *aux, *perc;
+    aux=(Bloco *)malloc(sizeof(Bloco));
+    if(aux==NULL)
+        return;
+    if(*p==NULL){
+        *p=aux;
+        aux->dado=d;
+        aux->proximo=NULL;
+    }
+    else{
+        perc=*p; //perc=a
+        while(perc->proximo!=NULL)
+            perc=perc->proximo;
+        perc->proximo=aux;
+        aux->dado=d;
+        aux->proximo=NULL;
+    }
+}
+
+
+Fun��o removedora 
+	
+	Passo a passo
+		1- Procurar o bloco a ser removido. ( 3 casos ) 
+		2- Remover os ponteiros e isolar o bloco. 
+		
+
+void remover ( Bloco **l, int d ){
+	Bloco *perc, *aux;
+	
+	if(*l==NULL) 
+		return;
+	if((*l)->dado==d ){ // ou (**l).dado==d
+		aux=*l;
+		*l= aux->proximo; // 8l=(*l)-> proximo
+		aux->prixmo=NULL;
+		free(aux);
+	}
+	else {
+		perc=*l;
+		
+		while(per->proximo->dado!=d)
+			perc=perc->proximo;
+		
+		aux=perc->proximo;
+		perc->proixmo=aux->proximo;
+		aux->proximo=NULL;
+		free(aux);
+	}
+}
+	
+Eerc�cio 
+1- Escrever uma fun��o para imprimir o conte�do  da lista 
+2- Escrever uma fun�o para imprimeir valores em ordem n�o decrescente 	
+  	

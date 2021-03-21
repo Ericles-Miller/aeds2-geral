@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1565132486 source:e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\conta.c
+	<stdio.h>
+	"conta.h"
+	"cliente.h"
+
+1565134361 source:e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\main.c
+	<stdio.h>
+	<stdlib.h>
+	"banco.h"
+
+1565131964 e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\banco.h
+	"conta.h"
+
+1565129004 e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\conta.h
+	"cliente.h"
+
+1565136044 e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\cliente.h
+
+1565133100 source:e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\cliente.c
+	<stdio.h>
+	"cliente.h"
+
+1565135873 source:e:\users\Éricles\documents\faculdade\unimontes\2° periodo\aeds2\aeds2\caribe\exemplo 1 - modularizacao por funcao e arquivo\meu exemplo\banco.c
+	"banco.h"
+	<stdio.h>
+
